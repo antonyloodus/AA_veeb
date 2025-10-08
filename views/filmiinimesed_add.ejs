@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Antony Loodus</title>
+</head>
+<body>
+  <img src="/images/vp_banner_2025_AA.jpg" alt="Kursuse bänner">
+  <h1>Antony Loodus, veebiprogrammeerimine</h1>
+  <p>See leht on loodud <a href="https://www.tlu.ee/">Tallinna Ülikooli</a> veebiprogrammeerimse kursusel ja see ei sisalda väärtuslikku informatsiooni.</p>
+  <hr>
+    <ul>
+  <li><a href="/">Avalehele</a></li>
+  <li><a href= "/eestifilm">Eesti filmi avaleht<a/></li>
+  </ul>
+  <h2>Eesti filmiga seotud inimeste lisamine</h2>
+	<form method="POST">
+	<label for="firstNameInput">Eesnimi</label>
+	<input id="firstNameInput" type="text" name="firstNameInput" placeholder="Kirjuta siia eesnimi" required>
+	<br>
+	<label for="lastNameInput">Perenimi</label>
+  <input id="lastNameInput" type="text" name="lastNameInput" placeholder="Kirjuta siia perenimi" required>
+  <br>
+  <label for="bornInput">Sünnikuupäev</label>
+  <input id="bornInput" name="bornInput" type="date" required>
+  <br>
+  <label for="deceaseInput">Surmakuupäev</label>
+  <input id="deceaseInput" name="deceaseInput" type="date">
+  <br>
+	<input id="personSubmit" name="personSubmit" type="submit" value="Salvesta">
+	</form>
+	<p><strong><%= notice %></strong></p>
+</body>
+</html>
