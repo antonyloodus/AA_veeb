@@ -15,4 +15,15 @@ const tellTimeET =function() {
 	return timeNow.getHours() + ":" + timeNow.getMinutes() + ":" + timeNow.getSeconds();
 }
 
-module.exports = {longDate: tellDateET, weekDay: tellWeekdayET, time: tellTimeET};
+const givenDateFormattedET = function(dateFromDb){
+  const givenDate = new Date(dateFromDb);
+  const pad = (n) => (n < 10 ? "0" + n : n);
+  return `${pad(timeNow.getHours())}:${pad(timeNow.getMinutes())}:${pad(timeNow.getSeconds())}`;
+};
+
+module.exports = {
+	longDate: tellDateET,
+	weekDay: tellWeekdayET,
+	time: tellTimeET
+};
+

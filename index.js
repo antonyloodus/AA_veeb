@@ -1,35 +1,63 @@
 const express = require("express");
 const dateEt = require("./src/dateTimeET");
-//lisan andmebaasiga suhtlemise paketi
-const mysql = require("mysql2");
-//lisan andmebaasi juurdepääsu info
+const mysql = require("mysql2/promise");
 const dbInfo = require("../../vp2025config");
 const fs = require("fs");
 const bodyparser = require("body-parser");
 const textRef = "public/txt/vanasonad.txt";
-//loome rakenduse, mis käivitab express raamistiku
 const app = express();
-//määran lehtede renderdaja (view engine)
 app.set("view engine", "ejs");
-//muudame public kataloogi veebiserverile kättesaadavaks
 app.use(express.static("public"));
 //asun päringut parsima. Parameeter lõpus on false, kui ainult tekst ja true, kui muud infot ka.
-app.use(bodyparser.urlencoded({extended: false}));
+app.use(bodyparser.urlencoded({extended: true}));
 
 //loome andmebaasiühenduse
-const conn = mysql.createConnection({
+/* const conn = mysql.createConnection({
 	host: dbInfo.configData.host,
 	user: dbInfo.configData.user,
 	password: dbInfo.configData.passWord,
 	database: dbInfo.configData.dataBase
-});
+}); */
 
+const dbConf = {
+	host: dbInfo.configData.host,
+	user: dbInfo.configData.user,
+	password: dbInfo.configData.passWord,
+	database: dbInfo.configData.dataBase
+};
+
+/* app.get("/", async (req, res)=>{
+	let conn;
+	try {
+		conn = await mysql.createConnection(dbConf);
+		let sqlReq = "SELECT filename, alttext FROM galleryphotos_aa WHERE id=(SELECT MAX(id) FROM galleryphotos_aa WHERE privacy=? AND deleted IS NULL)";
+		const privacy = 3;
+		const [rows, fields] = await conn.execute(sqlReq, [privacy]);
+		console.log(rows);
+		let imgAlt = "Avalik foto";
+		if(rows[0].alttext != ""){
+			imgAlt = rows[0].alttext;
+		}
+		res.render("index", {imgFile: "gallery/normal/" + rows[0].filename, imgAlt: imgAlt});
+	}
+	catch(err){
+		console.log(err);
+		res.render("index", {imgFile: "images/otsin_pilte.jpg", imgAlt: "Tunnen end, kui pilti otsiv lammas ..."});
+	}
+	finally {
+		if(conn){
+			await conn.end();
+			console.log("Andmebaasiühendus suletud!");
+		}
+	}
+});
+ */
 app.get("/", (req, res)=>{
 	//res.send("Express.js rakendus läkski käima!");
 	res.render("index");
 });
 
-app.get("/", (req, res)=>{
+app.get("/timenow", (req, res)=>{
 res.render("timenow", {wd: dateEt.weekDay(), date: dateEt.longDate()});
 });
 
@@ -45,7 +73,7 @@ app.get("/vanasonad", (req, res)=>{
 });
 	
 app.get("/regvisit", (req, res)=>{
-	res.render("reqvisit");
+	res.render("regvisit");
 });
 
 app.post("/regvisit", (req, res)=>{
@@ -84,52 +112,16 @@ app.get("/visitlog", (req, res)=>{
 	});
 });
 
-app.get("/eestifilm", (req, res)=>{
-	res.render("eestifilm");
-});
+//Eesti filmi marsruudid
+const eestifilmRouter = require("./routes/eestifilmRoutes");
+app.use("/eestifilm", eestifilmRouter);
 
-app.get("/eestifilm/filmiinimesed", (req, res)=>{
-	const sqlReq = "SELECT * FROM person";
-	//conn.query eksisteerib ka
-	conn.execute(sqlReq, (err, sqlRes)=>{
-		if(err){
-			console.log(err);
-			res.render("filmiinimesed", {personList:[]});
-		}
-		else {
-			console.log(sqlRes);
-		res.render("filmiinimesed", {personList: sqlRes});
-		}
-	});
-});
-	//res.render("filmiinimesed");
-	
-app.get("/eestifilm/filmiinimesed_add", (req, res)=>{
-	console.log(req.body);
-	res.render("filmiinimesed_add", {notice: "Ootan sisestust!"});
-});
+//Galeriipildi üleslaadimise marsruudid
+const galleryphotouploadRouter = require("./routes/galleryphotouploadRoutes");
+app.use("/galleryphotoupload", galleryphotouploadRouter);
 
-app.post("/eestifilm/filmiinimesed_add", (req, res)=>{
-	console.log(req.body);
-	//kontrollime andmeid
-	if(!req.body.firstNameInput || !req.body.lastNameInput || !req.body.bornInput){
-		res.render("filmiinimesed_add", {notice: "Andmed on vigased!"});
-	}
-	else {
-		let deceasedDate = null;
-		if (req.body.deceasedInput && req.body.deceasedInput.trim() !== '') {
-			deceasedDate = req.body.deceasedInput;
-		}
-		let sqlReq = "INSERT INTO person (first_name, last_name, born, deceased) VALUES (?,?,?,?)";
-		conn.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate], (err, sqlRes)=>{
-			if(err){
-				console.log(err);
-				res.render("filmiinimesed_add", {notice: "Tekkis tehniline viga: " + err});
-			} else {
-				res.render("filmiinimesed_add", {notice: "Andmed edukalt salvestatud!"});
-			}
-		});
-	}
-});
+//Fotogalerii marsruudid
+const photogalleryRouter = require("./routes/photogalleryRoutes");
+app.use("/photogallery", photogalleryRouter);
 
 app.listen(5327);
