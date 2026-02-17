@@ -4,13 +4,15 @@ const sharp = require("sharp");
 const dbInfo = require("../../../vp2025config");
 const dateTimeET = require("../src/dateTimeET.js");
 const watermarkFile = "./public/images/vp_logo_small.png";
+const pool = require("../src/dbPool");
 
-const dbConf = {
+
+/* const dbConf = {
 	host: dbInfo.configData.host,
 	user: dbInfo.configData.user,
 	password: dbInfo.configData.passWord,
 	database: dbInfo.configData.dataBase
-};
+}; */
 
 //@desc Home page for uploading gallery photos
 //@route GET /galleryphotoupload
@@ -25,7 +27,7 @@ const galleryphotouploadPage = (req, res)=>{
 //@access public
 
 const galleryphotouploadPagePost = async (req, res)=>{
-	let conn;
+	//let conn;
 	console.log(req.body);
 	console.log(req.file);
 	try {
@@ -41,7 +43,7 @@ const galleryphotouploadPagePost = async (req, res)=>{
 		let sqlReq = "INSERT INTO galleryphotos (filename, orig_name, alttext, privacy, userid) VALUES(?,?,?,?,?)";
 		//kuna kasutajakontosid pole, siis id on 1
 		const userId = 1;
-		const [result] = await conn.execute(sqlReq, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userId]);
+		const [result] = await pool.execute(sqlReq, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userId]);
 		console.log("Lisati foto id: " + result.insertId);
 	}
 	catch(err){
@@ -49,10 +51,10 @@ const galleryphotouploadPagePost = async (req, res)=>{
 		res.render("galleryphotoupload");
 	}
 	finally {
-		if(conn){
+		/* if(conn){
 			await conn.end();
 			console.log("Andmebaasiühendus suletud!");
-		}
+		} */
 	}
 	
 };

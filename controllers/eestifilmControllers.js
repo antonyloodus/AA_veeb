@@ -1,13 +1,15 @@
 const mysql = require("mysql2/promise");
 const dbInfo = require("../../../vp2025config");
 const dateTimeET = require("../src/dateTimeET.js");
+const pool = require("../src/dbPool");
 
-const dbConf = {
+
+/* const dbConf = {
 	host: dbInfo.configData.host,
 	user: dbInfo.configData.user,
 	password: dbInfo.configData.passWord,
 	database: dbInfo.configData.dataBase
-};
+}; */
 
 //@desc Home page for Estonian movie section
 //@route GET /eestifilm
@@ -26,9 +28,9 @@ const filmPeople = async (req, res)=>{
 	let conn;
 	const sqlReq = "SELECT * FROM person";
 	try {
-		conn = await mysql.createConnection(dbConf);
-		console.log("Andmebaasiühendus loodud");
-		const [rows, fields] = await conn.execute(sqlReq);
+		//conn = await mysql.createConnection(dbConf);
+		//console.log("Andmebaasiühendus loodud");
+		const [rows, fields] = await pool.execute(sqlReq);
 		rows.forEach(person => {
   	person.bornFormatted = dateTimeET.longDate(person.born);
 	});
@@ -39,10 +41,10 @@ const filmPeople = async (req, res)=>{
 		res.render("filmiinimesed", {personList: []});
 	}
 	finally {
-		if(conn){
+		/* if(conn){
 			await conn.end();
 			console.log("Andmebaasiühendus suletud!");
-		}
+		} */
 	}
 };
 
@@ -59,20 +61,20 @@ const filmPeopleAdd = (req, res)=>{
 //@access public
 
 const filmPeopleAddPost = async (req, res)=>{
-	let conn;
+	//let conn;
 	let sqlReq = "INSERT INTO person (first_name, last_name, born, deceased) VALUES (?,?,?,?)";
 	if(!req.body.firstNameInput || !req.body.lastNameInput || !req.body.bornInput || req.body.bornInput > new Date()){
 		res.render("filmiinimesed_add", {notice: "Andmed on vigased!"});
 		return;
 	}
 	try {
-		conn = await mysql.createConnection(dbConf);
+		//conn = await mysql.createConnection(dbConf);
 		console.log("Andmebaasiühendus loodud");
 		let deceasedDate = null;
 		if(req.body.deceasedInput != ""){
 			deceasedDate = req.body.deceasedInput;
 		}
-		const [result] = await conn.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate]);
+		const [result] = await pool.execute(sqlReq, [req.body.firstNameInput, req.body.lastNameInput, req.body.bornInput, deceasedDate]);
 		console.log("Salvestati kirje id: " + result.insertId);
 		res.render("filmiinimesed_add", {notice: "Andmed edukalt salvestatud!"});
 	}
@@ -81,10 +83,10 @@ const filmPeopleAddPost = async (req, res)=>{
 		res.render("filmiinimesed_add", {notice: "Tekkis tehniline viga!"});
 	}
 	finally {
-		if(conn){
+		/* if(conn){
 			await conn.end();
 			console.log("Andmebaasiühendus suletud!");
-		}
+		} */
 	}
 };
 
@@ -93,11 +95,11 @@ const filmPeopleAddPost = async (req, res)=>{
 //@access public
 
 const filmPosition = async (req, res) => {
-    let conn;
+    //let conn;
     const sqlReq = "SELECT * FROM position";
     try {
-        conn = await mysql.createConnection(dbConf);
-        const [rows, fields] = await conn.execute(sqlReq);
+        //conn = await mysql.createConnection(dbConf);
+        const [rows, fields] = await pool.execute(sqlReq);
         console.log(rows);
         res.render("filmiametid", {positionList: rows});
     }
@@ -106,9 +108,9 @@ const filmPosition = async (req, res) => {
         res.render("filmiametid", {positionList: []});
     }
     finally {
-        if(conn){
+        /* if(conn){
             await conn.end();
-        }
+        } */
     }
 };
 
@@ -130,9 +132,9 @@ const filmPositionAddPost = async (req, res)=>{
 		return res.render("filmiametid_add", {notice: "Palun kirjuta ameti nimetus!"});
 	}
 
-	let conn;
+	//let conn;
 	try {
-		conn = await mysql.createConnection(dbConf);
+		//conn = await mysql.createConnection(dbConf);
 
 		let positionDescription = null;
 		if(req.body.positionDescriptionInput != ""){
@@ -140,7 +142,7 @@ const filmPositionAddPost = async (req, res)=>{
 		}
 
 		let sqlReq = "INSERT INTO `position` (position_name, description) VALUES (?,?)";
-		conn.execute(sqlReq, [req.body.positionNameInput, positionDescription], (err, sqlRes)=>{
+		pool.execute(sqlReq, [req.body.positionNameInput, positionDescription], (err, sqlRes)=>{
 			if(err){
 				res.render("filmiametid_add", {notice: "Tekkis tehniline viga: " + err});
 			}

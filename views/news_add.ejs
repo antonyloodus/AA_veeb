@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Antony Loodus</title>
+</head>
+<body>
+  <img src="/images/vp_banner_2025_AA.jpg" alt="Kursuse bänner">
+  <h1>Antony Loodus, veebiprogrammeerimine</h1>
+  <p>See leht on loodud <a href="https://www.tlu.ee/">Tallinna Ülikooli</a> veebiprogrammeerimse kursusel ja see ei sisalda väärtuslikku informatsiooni.</p>
+  <hr>
+  <ul>
+    <li><a href="/">Avalehele</a></li>
+  </ul>
+<h2>Lisa uudis</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <br>
+    <label for= "titleInput">Uudise pealkiri</label> 
+    <input id="titleInput" type="text" name="titleInput" placeholder="Kirjuta uudise pealkirja" required> 
+    <br>
+    <label for= "contentInput">Uudise sisu</label>
+    <textarea id = "contentInput" name = "contentInput" rows= '5' cols= '100' placeholder='Sisesta uudise sisu' required></textarea>
+    <br>
+    <label for="newsPhotoInput">Vali pildifail</label>
+    <input id="newsPhotoInput" name="newsPhotoInput" type="file">
+    <br>
+    <label for="altInput">Lisa alternatiivtekst pildile</label>
+    <input id="altInput" name="altInput" type="text" placeholder="foto kirjeldus ...">
+    <br>
+    <label for="expireInput">Aegumise kpv</label>
+    <input id="expireInput" type="date" name="expireInput" required>
+    <br>
+    <input id="newsSubmit" name ="newsSubmit" type="submit" value="Postita uudis">
+</body>
+</html>

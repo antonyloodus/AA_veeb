@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="utf-8">
+  <title>Antony Loodus</title>
+  <link rel="stylesheet" href="/style/gallery.css">
+  <script src="/script/gallery.js" defer></script>
+</head>
+<body>
+  <img src="/images/vp_banner_2025_AA.jpg" alt="Kursuse bänner">
+  <h1>Antony Loodus, veebiprogrammeerimine</h1>
+  <p>See leht on loodud <a href="https://www.tlu.ee/">Tallinna Ülikooli</a> veebiprogrammeerimse kursusel ja see ei sisalda väärtuslikku informatsiooni.</p>
+  <hr>
+  <ul>
+<li><a href="/">Avalehele</a></li>
+  <ul>
+  <% newsList.forEach(function(listItem){ %>
+  <br>
+  <%= listItem.title %>
+  <br>
+  <%= listItem.content %>
+  <br>
+  Avaldatud <%= listItem.addedFormatted %>
+  <br> 
+  <% if (listItem.photofilename) { %>
+  <br>
+  <img src="/news_photos/normal/<%= listItem.photofilename %>" alt="<%= listItem.alttext %>">
+  <% } %>
+  </li>
+  <% }); %>
+  </ul>
+</body>
+</html>

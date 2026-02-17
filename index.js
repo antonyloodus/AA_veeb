@@ -1,11 +1,14 @@
 const express = require("express");
+require("dotenv").config();
 const dateEt = require("./src/dateTimeET");
 const mysql = require("mysql2/promise");
 const dbInfo = require("../../vp2025config");
 const fs = require("fs");
 const bodyparser = require("body-parser");
+const pool = require("./src/dbPool");
 const textRef = "public/txt/vanasonad.txt";
 const app = express();
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 //asun päringut parsima. Parameeter lõpus on false, kui ainult tekst ja true, kui muud infot ka.
@@ -19,20 +22,21 @@ app.use(bodyparser.urlencoded({extended: true}));
 	database: dbInfo.configData.dataBase
 }); */
 
-const dbConf = {
+/* const dbConf = {
 	host: dbInfo.configData.host,
 	user: dbInfo.configData.user,
 	password: dbInfo.configData.passWord,
 	database: dbInfo.configData.dataBase
-};
+}; */
 
-/* app.get("/", async (req, res)=>{
-	let conn;
+app.get("/", async (req, res)=>{
+	//let conn;
 	try {
-		conn = await mysql.createConnection(dbConf);
-		let sqlReq = "SELECT filename, alttext FROM galleryphotos_aa WHERE id=(SELECT MAX(id) FROM galleryphotos_aa WHERE privacy=? AND deleted IS NULL)";
+		//conn = await mysql.createConnection(dbConf);
+		let sqlReq = "SELECT filename, alttext FROM galleryphotos WHERE id=(SELECT MAX(id) FROM galleryphotos WHERE privacy=? AND deleted IS NULL)";
 		const privacy = 3;
-		const [rows, fields] = await conn.execute(sqlReq, [privacy]);
+		//const [rows, fields] = await conn.execute(sqlReq, [privacy]);
+		const [rows, fields] = await pool.execute(sqlReq, [privacy]);
 		console.log(rows);
 		let imgAlt = "Avalik foto";
 		if(rows[0].alttext != ""){
@@ -45,13 +49,13 @@ const dbConf = {
 		res.render("index", {imgFile: "images/otsin_pilte.jpg", imgAlt: "Tunnen end, kui pilti otsiv lammas ..."});
 	}
 	finally {
-		if(conn){
+		/* if(conn){
 			await conn.end();
 			console.log("Andmebaasiühendus suletud!");
-		}
+		} */
 	}
 });
- */
+
 app.get("/", (req, res)=>{
 	//res.send("Express.js rakendus läkski käima!");
 	res.render("index");
@@ -116,12 +120,21 @@ app.get("/visitlog", (req, res)=>{
 const eestifilmRouter = require("./routes/eestifilmRoutes");
 app.use("/eestifilm", eestifilmRouter);
 
-//Galeriipildi üleslaadimise marsruudid
+	//Galeriipildi üleslaadimise marsruudid
 const galleryphotouploadRouter = require("./routes/galleryphotouploadRoutes");
 app.use("/galleryphotoupload", galleryphotouploadRouter);
 
 //Fotogalerii marsruudid
 const photogalleryRouter = require("./routes/photogalleryRoutes");
 app.use("/photogallery", photogalleryRouter);
+
+//Uudiste marsruudid
+const newsRouter = require("./routes/newsRoutes");
+app.use("/news", newsRouter);
+
+//Kasutajakonto marsruudid
+const signupRouter = require("./routes/signupRoutes");
+app.use("/signup", signupRouter);
+
 
 app.listen(5327);
